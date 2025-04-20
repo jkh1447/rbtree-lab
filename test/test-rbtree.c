@@ -24,6 +24,9 @@ void test_insert_single(const key_t key) {
   assert(p != NULL);
   assert(t->root == p);
   assert(p->key == key);
+  // assert(p->parent == t->nil);
+  // assert(p->left == t->nil);
+  // assert(p->right == t->nil);
   // assert(p->color == RBTREE_BLACK);  // color of root node should be black
 #ifdef SENTINEL
   assert(p->left == t->nil);
@@ -43,11 +46,16 @@ void test_find_single(const key_t key, const key_t wrong_key) {
   node_t *p = rbtree_insert(t, key);
 
   node_t *q = rbtree_find(t, key);
+  
   assert(q != NULL);
   assert(q->key == key);
   assert(q == p);
+  
+  // printf("p->key: %d q->key: %d\n", p->key, q->key);
+  // fflush(stdout);
 
   q = rbtree_find(t, wrong_key);
+  // key는 잘 들어갔는데, wrong key를 잘 못찾는다
   assert(q == NULL);
 
   delete_rbtree(t);
@@ -138,6 +146,8 @@ void test_to_array(rbtree *t, const key_t *arr, const size_t n) {
   for (int i = 0; i < n; i++) {
     assert(arr[i] == res[i]);
   }
+  // printf("%d %d %d %d\n", res[0], res[1], res[2], res[3]);
+  // fflush(stdout);
   free(res);
 }
 
@@ -173,6 +183,7 @@ void test_multi_instance() {
   free(res1);
   delete_rbtree(t2);
   delete_rbtree(t1);
+  
 }
 
 // Search tree constraint
@@ -314,15 +325,19 @@ void test_find_erase(rbtree *t, const key_t *arr, const size_t n) {
   for (int i = 0; i < n; i++) {
     node_t *p = rbtree_insert(t, arr[i]);
     assert(p != NULL);
-  }
 
+  }
+  //deletion 이 문제
   for (int i = 0; i < n; i++) {
+    
     node_t *p = rbtree_find(t, arr[i]);
-    // printf("arr[%d] = %d\n", i, arr[i]);
+    
     assert(p != NULL);
     assert(p->key == arr[i]);
     rbtree_erase(t, p);
+    
   }
+  
 
   for (int i = 0; i < n; i++) {
     node_t *p = rbtree_find(t, arr[i]);
@@ -354,12 +369,16 @@ void test_find_erase_fixed() {
 }
 
 void test_find_erase_rand(const size_t n, const unsigned int seed) {
+  
   srand(seed);
   rbtree *t = new_rbtree();
   key_t *arr = calloc(n, sizeof(key_t));
   for (int i = 0; i < n; i++) {
+    
     arr[i] = rand();
+    
   }
+  
 
   test_find_erase(t, arr, n);
 
@@ -379,5 +398,6 @@ int main(void) {
   test_duplicate_values();
   test_multi_instance();
   test_find_erase_rand(10000, 17);
+  
   printf("Passed all tests!\n");
 }
